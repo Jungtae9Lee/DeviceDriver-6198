@@ -1,27 +1,33 @@
 #include "DeviceDriver.h"
-#include <exception>
-using namespace std;
 
-const int MAX_CNT =  4;
+#include <exception>
+
 DeviceDriver::DeviceDriver(FlashMemoryDevice* hardware) : m_hardware(hardware)
 {}
 
+class ReadFailException : public std::exception {
+};
+
+class WriteFailException : public std::exception {
+};
+
 int DeviceDriver::read(long address)
 {
-    // TODO: implement this method properly
-    int result = (int)(m_hardware->read(address));
+    int firstReadTryValue = (int)(m_hardware->read(address));
+    for (int tryCount = 2; tryCount <= 5; tryCount++) {
+        int nextReadTryValue = (int)(m_hardware->read(address));
+        if (firstReadTryValue == nextReadTryValue) continue;
 
-    for (int i = 0; i < MAX_CNT; ++i)   {
-        int nextResult = (int)(m_hardware->read(address));
-        if (result == nextResult) continue;
-        throw exception("Exception!!");
+        throw ReadFailException();
     }
 
-    return result;
+    return firstReadTryValue;
 }
 
 void DeviceDriver::write(long address, int data)
 {
-    // TODO: implement this method
+    if ((int)m_hardware->read(address) != 0xFF) {
+        throw WriteFailException();
+    }
     m_hardware->write(address, (unsigned char)data);
 }
