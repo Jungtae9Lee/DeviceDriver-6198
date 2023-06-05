@@ -41,3 +41,15 @@ TEST(TestCaseName, Exception) {
 
 	//EXPECT_THAT(1, Eq(1));
 }
+
+TEST(TestCaseName, WriteDefautl) {
+
+	// ´ë¿ª
+	MockDevice mock_device;
+
+	EXPECT_CALL(mock_device, write(0x2,77)).Times(1);
+	DeviceDriver driver(&mock_device);
+	driver.write(0x2, 77);
+
+	//EXPECT_THAT(1, Eq(1));
+}
